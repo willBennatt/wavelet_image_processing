@@ -1,6 +1,7 @@
 import numpy as np
 import pywt
 import math
+import matplotlib.pyplot as plt
 
 def bensEntropy(image):
     np.set_printoptions(threshold=np.nan)
@@ -28,10 +29,35 @@ image = np.loadtxt('AFMimage1.txt')
 coeffs = pywt.wavedec2(image, 'haar')
 levels = len(coeffs)-1
 
-cH7, cV7, cD7 = coeffs[3]
-cH3, cV3, cD3 = coeffs[7]
+# run the transformed image through ben's entropy thing, then plot the entropies
+horizontal = []
+vertical = []
+diagonal = []
+xAxis = []
 
-# do whatever with the coefficients
-print('entropy before: ' + str(getEntropy(cH3)))
-entropyArray = bensEntropy(cH3)
-print('entropy after: ' + str(getEntropy(entropyArray)))
+for index in range(1, levels + 1): 
+    cH, cV, cD = coeffs[index]
+    cH = bensEntropy(cH)
+    cV = bensEntropy(cV)
+    cD = bensEntropy(cD)
+    cHentropy = getEntropy(cH)
+    cVentropy = getEntropy(cV)
+    cDentropy = getEntropy(cD)
+    horizontal.append(cHentropy)
+    vertical.append(cVentropy)
+    diagonal.append(cDentropy)
+    xAxis.append(levels + 1 - index)
+
+# plot the different entropies
+plt.figure(1)
+plt.subplot(511)
+plt.plot(xAxis, horizontal, 'r')
+plt.ylabel('Horizontal Entropy')
+plt.subplot(513)
+plt.plot(xAxis, vertical, 'b')
+plt.ylabel('Vertical Entropy')
+plt.subplot(515)
+plt.plot(xAxis, diagonal, 'g')
+plt.ylabel('Diagonal Entropy')
+plt.xlabel('Level')
+plt.show()
